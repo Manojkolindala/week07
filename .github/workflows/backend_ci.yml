@@ -129,16 +129,19 @@ jobs:
     - name: Login to Azure Container Registry
       run: az acr login --name ${{ env.ACR_LOGIN_SERVER }}
 
-     # Build and Push Docker image for Product Service
+     # Build & push Product Service (run from its folder so '.' is the context)
     - name: Build and Push Product Service Image
+      working-directory: backend/product_service
       run: |
-        docker buildx build -t ${{ env.ACR_LOGIN_SERVER }}/product_service:latest ./backend/product_service --push
+        docker build -t "${{ env.ACR_LOGIN_SERVER }}/product_service:latest" .
+        docker push "${{ env.ACR_LOGIN_SERVER }}/product_service:latest"
 
-    # Build and Push Docker image for Order Service
+    # Build & push Order Service
     - name: Build and Push Order Service Image
+      working-directory: backend/order_service
       run: |
-        docker buildx build -t ${{ env.ACR_LOGIN_SERVER }}/order_service:latest ./backend/order_service --push
-
+        docker build -t "${{ env.ACR_LOGIN_SERVER }}/order_service:latest" .
+        docker push "${{ env.ACR_LOGIN_SERVER }}/order_service:latest"
 
     # Logout from Azure for security (runs even if image push fails)
     - name: Logout from Azure
